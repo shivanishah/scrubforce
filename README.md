@@ -30,7 +30,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Status
 
-Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 4 (residential services page) complete. Hero trust-stat numbers are placeholders pending real figures.
+Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 5 (commercial services page) complete. Hero trust-stat numbers are placeholders pending real figures; Commercial page images are styled placeholders pending real photos (no image-gen tool available in this environment).
 
 ## Deployment
 

@@ -89,7 +89,7 @@ Build out these four target sectors, each with its own card/section (icon, short
 3. **Gyms / Fitness Centres**
 4. **Auto / Car Dealerships**
 
-For structure, follow selectcleaningrd.com's pattern (service cards → process → trust signals) but adapt content to these four sectors instead of residential end-of-lease framing. Include a general trust-signals block (insured, trained staff, consistent scheduling, dedicated contact — not a call centre).
+For structure, follow selectcleaningrd.com's pattern (service cards → process → trust signals) but adapt content to these four sectors instead of residential end-of-lease framing. Include a general trust-signals block (insured, trained staff, consistent scheduling, dedicated contact — not a call centre). Add images wherever applicable.
 - Test + update docs
 - Commit: `feat: add commercial services page`
 - Push: on main branch
