@@ -108,6 +108,10 @@ No test runner is configured yet.
 - `src/app/contact/page.tsx` — phone/email/hours cards, the same channel list as icon links, a `PlaceholderImage` standing in for a map embed (no real business address yet to embed), and a contact form.
 - `src/components/contact/ContactForm.tsx` + `src/lib/contact-schema.ts` + `src/app/api/contact/route.ts` — same RHF+Zod+Resend pattern as the quote form (Step 6), reusing `RESEND_API_KEY`/`QUOTE_TO_EMAIL`/`QUOTE_FROM_EMAIL` env vars rather than introducing new ones for a second inbox.
 
+## Footer (Step 9)
+
+`src/lib/nav-links.ts` — `NAV_LINKS`/`QUOTE_LINK` extracted here so `Header.tsx` and `Footer.tsx` share one source of truth instead of duplicating the tab list. `src/components/Footer.tsx` — repeats nav links, `CONTACT_CHANNELS` social links (same placeholders as Contact page), an Adelaide-service-area note, and a copyright line with a dynamic year. Rendered globally from `layout.tsx` below `{children}`, above `ContactWidget`.
+
 ## Decisions Made So Far
 
 - Font pairing: **Manrope + Space Mono** (chosen over Inter/JetBrains Mono alternatives offered in the build plan)

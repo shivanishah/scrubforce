@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { ContactWidget } from "@/components/ContactWidget";
 
 const manrope = Manrope({
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Header />
         {children}
+        <Footer />
         <ContactWidget />
       </body>
     </html>

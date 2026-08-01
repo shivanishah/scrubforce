@@ -30,7 +30,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Status
 
-Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 8 (contact page + floating chat widget) complete — copy `.env.example` to `.env.local` and fill in `RESEND_API_KEY`/`QUOTE_TO_EMAIL` for the quote and contact forms to actually send. Hero trust-stat numbers, Commercial page images, and Contact page phone/email/social links (`src/lib/contact-channels.ts`) are all placeholders pending real business details (no image-gen tool available in this environment for the photos).
+Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 9 (footer) complete — copy `.env.example` to `.env.local` and fill in `RESEND_API_KEY`/`QUOTE_TO_EMAIL` for the quote and contact forms to actually send. Hero trust-stat numbers, Commercial page images, and phone/email/social links (`src/lib/contact-channels.ts`, shown on both the Contact page and footer) are all placeholders pending real business details (no image-gen tool available in this environment for the photos).
 
 ## Deployment
 
