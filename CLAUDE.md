@@ -101,6 +101,13 @@ No test runner is configured yet.
 
 `src/app/why-us/page.tsx` — re-clean guarantee callout, `TrustBadges` (Fully Insured / Trained & Inducted Staff / Background-Checked / Eco-Friendly Products — a different set from Residential's), `ProcessSteps` 3-step "How It Works" (Get Your Quote → We Clean → Enjoy Your Space), a "no franchise" positioning callout, and a closing quote CTA. Both `TrustBadges` and `ProcessSteps` from Steps 4–5 were reused here as intended rather than rebuilt.
 
+## Contact Page & ContactWidget (Step 8)
+
+- `src/lib/contact-channels.ts` — single source of truth for `CONTACT_CHANNELS` (WhatsApp/Messenger/Instagram/TikTok, lucide-react has no brand logos so generic icons stand in: `MessageCircle`/`MessagesSquare`/`Camera`/`Music2`) and `CONTACT_INFO` (phone/email/hours). **All four channel `href`s are `"#"` placeholders and phone/email are placeholder text** (`(08) XXXX XXXX`, `hello@scrubforce.com.au`) — real business details weren't available yet; update this one file to go live everywhere at once.
+- `src/components/ContactWidget.tsx` — floating bottom-right chat bubble, rendered globally from `src/app/layout.tsx` (visible on every page, not just `/contact`). Self-contained: toggling, Escape-to-close, and channel list all read from `contact-channels.ts`, so swapping in a real chat provider (Tawk.to, Crisp, Intercom) later means replacing this one component without touching call sites.
+- `src/app/contact/page.tsx` — phone/email/hours cards, the same channel list as icon links, a `PlaceholderImage` standing in for a map embed (no real business address yet to embed), and a contact form.
+- `src/components/contact/ContactForm.tsx` + `src/lib/contact-schema.ts` + `src/app/api/contact/route.ts` — same RHF+Zod+Resend pattern as the quote form (Step 6), reusing `RESEND_API_KEY`/`QUOTE_TO_EMAIL`/`QUOTE_FROM_EMAIL` env vars rather than introducing new ones for a second inbox.
+
 ## Decisions Made So Far
 
 - Font pairing: **Manrope + Space Mono** (chosen over Inter/JetBrains Mono alternatives offered in the build plan)
