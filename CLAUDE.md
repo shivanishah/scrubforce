@@ -97,6 +97,10 @@ No test runner is configured yet.
 - **Phase 2 (AI quote flow): scaffolded, not wired.** `src/components/quote/AIQuoteFlow.tsx` renders an inert step-indicator + property-type-picker preview, dimmed behind a "coming soon" badge overlay (`pointer-events-none`, `tabIndex={-1}` on all controls). Rendered next to `QuoteForm` on `/quote`. No pricing logic, no step transitions — purely a visual shell per the build plan.
 - Base UI's `Select` (via `Controller`) must be given a defined initial value (`""`, not `undefined`) in RHF `defaultValues` — otherwise it logs an uncontrolled→controlled warning on first selection. Empty string still shows the placeholder correctly (Base UI checks the stringified value, not just `!= null`).
 
+## Why Us Page (Step 7)
+
+`src/app/why-us/page.tsx` — re-clean guarantee callout, `TrustBadges` (Fully Insured / Trained & Inducted Staff / Background-Checked / Eco-Friendly Products — a different set from Residential's), `ProcessSteps` 3-step "How It Works" (Get Your Quote → We Clean → Enjoy Your Space), a "no franchise" positioning callout, and a closing quote CTA. Both `TrustBadges` and `ProcessSteps` from Steps 4–5 were reused here as intended rather than rebuilt.
+
 ## Decisions Made So Far
 
 - Font pairing: **Manrope + Space Mono** (chosen over Inter/JetBrains Mono alternatives offered in the build plan)
