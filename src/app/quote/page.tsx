@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { QuoteForm } from "@/components/quote/QuoteForm";
+import { AIQuoteFlow } from "@/components/quote/AIQuoteFlow";
 
 export const metadata: Metadata = {
   title: "Get Your Quote | ScrubForce",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 export default function QuotePage() {
   return (
     <main className="flex flex-1 flex-col">
-      <section className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6">
+      <section className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
         <p className="font-mono text-sm tracking-wide text-primary">
           {"// get started"}
         </p>
@@ -23,8 +24,13 @@ export default function QuotePage() {
           no call centre, no franchise markup.
         </p>
 
-        <div className="mt-10">
-          <QuoteForm />
+        <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <QuoteForm />
+          </div>
+          <div>
+            <AIQuoteFlow />
+          </div>
         </div>
       </section>
     </main>
