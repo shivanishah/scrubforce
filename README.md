@@ -30,7 +30,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Status
 
-Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 5 (commercial services page) complete. Hero trust-stat numbers are placeholders pending real figures; Commercial page images are styled placeholders pending real photos (no image-gen tool available in this environment).
+Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 6 Phase 1 (quote request form, emailing via Resend) complete — copy `.env.example` to `.env.local` and fill in `RESEND_API_KEY`/`QUOTE_TO_EMAIL` for the form to actually send. Hero trust-stat numbers are placeholders pending real figures; Commercial page images are styled placeholders pending real photos (no image-gen tool available in this environment).
 
 ## Deployment
 

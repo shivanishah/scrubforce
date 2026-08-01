@@ -93,11 +93,14 @@ No test runner is configured yet.
 
 ## Quote System Status
 
-- **Phase 1 (standard form):** not yet built — planned for Step 6. Will use React Hook Form + Zod. Submit backend (email service e.g. Resend vs. database) is an open decision — ask the user before wiring it up.
-- **Phase 2 (AI quote flow):** not yet built — planned for Step 6, scaffolded only. Will live in `components/quote/AIQuoteFlow.tsx`, shown behind a "coming soon" badge, isolated from Phase 1, no real pricing logic wired.
+- **Phase 1 (standard form): live.** `/quote` renders `QuoteForm` (`src/components/quote/QuoteForm.tsx`) — React Hook Form + Zod (`src/lib/quote-schema.ts`, shared with the server route), fields: name, email, phone, suburb/postcode, property type, service (options depend on property type), frequency, optional message. Submits to `POST /api/quote` (`src/app/api/quote/route.ts`), which re-validates server-side and emails the submission via **Resend**. Requires `RESEND_API_KEY` and `QUOTE_TO_EMAIL` env vars (see `.env.example`) — without them the route returns a 500 with a clear message and logs the submission instead of losing it.
+- **Phase 2 (AI quote flow): scaffolded, not wired.** `src/components/quote/AIQuoteFlow.tsx` renders an inert step-indicator + property-type-picker preview, dimmed behind a "coming soon" badge overlay (`pointer-events-none`, `tabIndex={-1}` on all controls). Rendered next to `QuoteForm` on `/quote`. No pricing logic, no step transitions — purely a visual shell per the build plan.
+- Base UI's `Select` (via `Controller`) must be given a defined initial value (`""`, not `undefined`) in RHF `defaultValues` — otherwise it logs an uncontrolled→controlled warning on first selection. Empty string still shows the placeholder correctly (Base UI checks the stringified value, not just `!= null`).
 
 ## Decisions Made So Far
 
 - Font pairing: **Manrope + Space Mono** (chosen over Inter/JetBrains Mono alternatives offered in the build plan)
 - CTA accent color: **amber `#d97706`** (chosen over teal or deep red alternatives), paired with charcoal (not white) foreground text for AA contrast
 - Corner radius tightened from shadcn's default `0.625rem` to `0.375rem` for a sharper, more systematic feel
+- Quote form backend: **Resend** (chosen over a database) for emailing submissions — simpler for quote-request volume, no DB to manage
+- Real secrets go in `.env.local` (gitignored, never committed) — `.env.example` must stay blank placeholders since it *is* committed as the template for other developers
