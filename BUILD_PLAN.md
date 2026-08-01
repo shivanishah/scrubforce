@@ -48,6 +48,7 @@ Build a professional, "geeky" cleaning services website called **ScrubForce**.
 - Test: build passes, all nav links route correctly, mobile menu opens/closes
 - Update CLAUDE.md/README.md with header component notes
 - Commit: `feat: add responsive header and navigation`
+- Push: on main branch
 
 ### Step 2 — Home / Hero Section
 - Hero headline + subheadline emphasizing **Adelaide-based, no franchises, covering all of Adelaide**
@@ -57,6 +58,7 @@ Build a professional, "geeky" cleaning services website called **ScrubForce**.
 - Test: renders correctly at mobile/tablet/desktop breakpoints
 - Update docs
 - Commit: `feat: add hero section to home page`
+- Push: on main branch
 
 ### Step 3 — Services Overview Section
 - Grid/card layout of core services with icons, split conceptually into Residential and Commercial groups
@@ -65,6 +67,7 @@ Build a professional, "geeky" cleaning services website called **ScrubForce**.
 - Test: build + responsive check
 - Update docs
 - Commit: `feat: add services overview section`
+- Push: on main branch
 
 ### Step 4 — Residential Page
 Build out these five specific services, each with its own card/section (icon, short description, CTA to quote):
@@ -77,6 +80,7 @@ Build out these five specific services, each with its own card/section (icon, sh
 Structure this page similarly to selectcleaningrd.com's residential sections: service cards up top, then a "what's included" checklist-style breakdown, then trust/guarantee reinforcement.
 - Test + update docs
 - Commit: `feat: add residential services page`
+- Push: on main branch
 
 ### Step 5 — Commercial Page
 Build out these four target sectors, each with its own card/section (icon, short description, CTA to quote):
@@ -88,6 +92,7 @@ Build out these four target sectors, each with its own card/section (icon, short
 For structure, follow selectcleaningrd.com's pattern (service cards → process → trust signals) but adapt content to these four sectors instead of residential end-of-lease framing. Include a general trust-signals block (insured, trained staff, consistent scheduling, dedicated contact — not a call centre).
 - Test + update docs
 - Commit: `feat: add commercial services page`
+- Push: on main branch
 
 ### Step 6 — Get Your Quote Section (Two Phases)
 
@@ -99,6 +104,7 @@ For structure, follow selectcleaningrd.com's pattern (service cards → process 
 - Test: form validation works, submission handled gracefully, accessible labels/errors
 - Update docs
 - Commit: `feat: add quote request form with validation`
+- Push: on main branch
 
 **Phase 2 (build as a placeholder now, real logic later): AI Quote — Coming Soon**
 - Add a visible banner/badge near the quote form: *"AI-powered instant quotes — coming soon"*
@@ -107,6 +113,7 @@ For structure, follow selectcleaningrd.com's pattern (service cards → process 
 - Test: Phase 1 form still fully functional; Phase 2 UI shell renders but is clearly marked not-yet-active
 - Update docs (note in CLAUDE.md that Phase 2 is scaffolded but not wired to real pricing logic)
 - Commit: `feat: add quote form (phase 1) and AI quote flow scaffold (phase 2, coming soon)`
+- Push: on main branch
 
 ### Step 7 — Why Us Section
 Structure this after selectcleaningrd.com's trust-building sections:
@@ -116,6 +123,7 @@ Structure this after selectcleaningrd.com's trust-building sections:
 - Reinforce local/independent positioning: Adelaide-owned, no franchise, direct accountability
 - Test + update docs
 - Commit: `feat: add why us section`
+- Push: on main branch
 
 ### Step 8 — Contact Us Page
 Include:
@@ -126,11 +134,13 @@ Include:
 - Optional: contact form (can reuse quote form components) + map embed of Adelaide service area
 - Test + update docs
 - Commit: `feat: add contact us page with multi-channel chat widget`
+- Push: on main branch
 
 ### Step 9 — Footer
 - Nav links repeated, social links (WhatsApp/Facebook/Instagram/TikTok), Adelaide service area note, copyright
 - Test + update docs
 - Commit: `feat: add footer`
+- Push: on main branch
 
 ### Step 10 — Polish Pass
 - Add Framer Motion scroll-reveal animations (subtle — fade/slide only, respect `prefers-reduced-motion`)
@@ -139,6 +149,7 @@ Include:
 - Final full-site test across breakpoints
 - Final update to CLAUDE.md and README.md summarizing full architecture
 - Commit: `chore: final polish, accessibility, and performance pass`
+- Push: on main branch
 
 ## What CLAUDE.md Should Contain (keep updated throughout)
 - Project summary and brand voice ("professional and geeky", Adelaide-based, no franchise)

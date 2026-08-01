@@ -42,9 +42,10 @@ There is no separate `tailwind.config.ts`; new design tokens must be added as CS
 
 ## Folder Structure Conventions
 
-- `src/app/` — one route segment per top-level nav tab (`/services`, `/residential`, `/commercial`, `/quote`, `/why-us`, `/contact`), plus `layout.tsx` (fonts, `<html>`/`<body>` shell) and `page.tsx` (home)
-- `src/components/ui/` — shadcn-generated primitives (Button, etc.) — treat as generated code, prefer `npx shadcn add` over hand-editing
+- `src/app/` — one route segment per top-level nav tab (`/services`, `/residential`, `/commercial`, `/quote`, `/why-us`, `/contact`), plus `layout.tsx` (fonts, `<html>`/`<body>` shell, renders `<Header />`) and `page.tsx` (home)
+- `src/components/ui/` — shadcn-generated primitives (Button, Sheet, etc.) — treat as generated code, prefer `npx shadcn add` over hand-editing. This project uses shadcn's **Base UI** flavor (`@base-ui/react`), not Radix — components take a `render={<Element />}` prop for polymorphism, not `asChild`. To style a `Link`/anchor as a button, apply `buttonVariants({...})` to its `className` directly rather than wrapping it in `<Button asChild>`.
 - `src/components/` — hand-written composed components (header, sections, forms) as they're added
+- `src/components/Header.tsx` — sticky site header (Step 1). Desktop: inline nav + amber CTA link styled via `buttonVariants()`. Mobile (`<md`): CTA + hamburger that opens a shadcn `Sheet` (right-side drawer) with the same nav links; links auto-close the sheet via `SheetClose`. Active route highlighted using `usePathname()`.
 - `src/components/quote/AIQuoteFlow.tsx` — isolated Phase 2 "coming soon" quote flow scaffold (see Step 6 status below); must stay decoupled from the working Phase 1 form
 - `src/components/ContactWidget.tsx` — floating multi-channel chat bubble (Step 8), self-contained so channel links can be swapped for a real chat provider later
 - `src/lib/utils.ts` — shadcn's `cn()` helper

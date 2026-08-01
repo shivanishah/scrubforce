@@ -30,7 +30,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Status
 
-Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 0 (project scaffold) complete.
+Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 1 (responsive header/nav) complete.
 
 ## Deployment
 
