@@ -62,12 +62,12 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2 md:hidden">
-          <Link href={QUOTE_LINK.href} className={buttonVariants({ size: "sm" })}>
+          <Link href={QUOTE_LINK.href} className={cn(buttonVariants({ size: "sm" }))}>
             {QUOTE_LINK.label}
           </Link>
           <Sheet>
             <SheetTrigger
-              className={buttonVariants({ variant: "ghost", size: "icon" })}
+              className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
               aria-label="Open menu"
             >
               <Menu className="size-5" />
