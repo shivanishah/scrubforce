@@ -13,6 +13,7 @@ import {
   BadgeCheck,
 } from "lucide-react";
 
+import { Reveal } from "@/components/motion/Reveal";
 import { DetailServiceCard } from "@/components/services/DetailServiceCard";
 import { TrustBadges } from "@/components/services/TrustBadges";
 import { buttonVariants } from "@/components/ui/button";
@@ -84,7 +85,7 @@ export default function ResidentialPage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-        <p className="font-mono text-sm tracking-wide text-primary">
+        <p className="font-mono text-sm tracking-wide text-primary-text">
           {"// for your home"}
         </p>
         <h1 className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -96,13 +97,13 @@ export default function ResidentialPage() {
           not a franchise territory.
         </p>
 
-        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {RESIDENTIAL_SERVICES.map((service) => (
             <DetailServiceCard key={service.id} {...service} />
           ))}
-        </div>
+        </Reveal>
 
-        <div className="mt-16">
+        <Reveal className="mt-16">
           <h2 className="text-xl font-semibold text-foreground">
             What&apos;s Included
           </h2>
@@ -121,9 +122,9 @@ export default function ResidentialPage() {
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
 
-        <div className="mt-16">
+        <Reveal className="mt-16">
           <h2 className="text-xl font-semibold text-foreground">
             Our Guarantee
           </h2>
@@ -134,16 +135,16 @@ export default function ResidentialPage() {
           <div className="mt-6">
             <TrustBadges items={TRUST_ITEMS} />
           </div>
-        </div>
+        </Reveal>
 
-        <div className="mt-16 flex flex-col items-start gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+        <Reveal className="mt-16 flex flex-col items-start gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-foreground">
             Ready for a spotless home? Get a quote in minutes.
           </p>
           <Link href="/quote" className={cn(buttonVariants(), "shrink-0")}>
             Get Your Quote
           </Link>
-        </div>
+        </Reveal>
       </section>
     </main>
   );

@@ -6,18 +6,22 @@ ScrubForce is an independently operated cleaning service covering all of metropo
 
 - Next.js 16 (App Router) + TypeScript
 - Tailwind CSS v4
-- shadcn/ui
+- shadcn/ui (Base UI flavor)
 - Framer Motion
 - React Hook Form + Zod
+- Resend (transactional email)
 
 ## Setup
 
 ```bash
 npm install
+cp .env.example .env.local   # fill in RESEND_API_KEY and QUOTE_TO_EMAIL
 npm run dev
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
+
+Without `RESEND_API_KEY`/`QUOTE_TO_EMAIL` set, the quote and contact forms still validate and submit, but the API routes return a friendly error instead of sending an email (and log the submission server-side).
 
 ## Scripts
 
@@ -28,9 +32,20 @@ Then open [http://localhost:3000](http://localhost:3000).
 | `npm run start` | Serve the production build |
 | `npm run lint` | Run ESLint |
 
+## Pages
+
+Home, Services, Residential, Commercial, Why Us, Contact Us, Get Your Quote — plus a sitewide floating multi-channel chat widget and footer.
+
 ## Status
 
-Under active section-by-section build — see `BUILD_PLAN.md` for the full build order and `CLAUDE.md` for architecture/design tokens. Currently: Step 9 (footer) complete — copy `.env.example` to `.env.local` and fill in `RESEND_API_KEY`/`QUOTE_TO_EMAIL` for the quote and contact forms to actually send. Hero trust-stat numbers, Commercial page images, and phone/email/social links (`src/lib/contact-channels.ts`, shown on both the Contact page and footer) are all placeholders pending real business details (no image-gen tool available in this environment for the photos).
+Initial build complete (`BUILD_PLAN.md` Steps 0–10). See `CLAUDE.md` for full architecture, design tokens, and component reference.
+
+**Placeholder content that needs real data before launch** (all documented in `CLAUDE.md`):
+- Hero trust stats (homes cleaned / satisfaction / suburbs covered)
+- Phone, email, and WhatsApp/Messenger/Instagram/TikTok links (`src/lib/contact-channels.ts` — single source of truth for the Contact page, footer, and chat widget)
+- Commercial page photos and the Contact page map embed (styled placeholders — no image-generation tool was available and no real photos/address were supplied)
+
+Lighthouse (production build, all pages): Accessibility 100, Best Practices 100, SEO 100, Performance 92–97.
 
 ## Deployment
 

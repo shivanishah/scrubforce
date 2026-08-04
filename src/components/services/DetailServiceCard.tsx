@@ -27,7 +27,7 @@ export function DetailServiceCard({
         <PlaceholderImage label={imageLabel} className="aspect-video" />
       )}
       <Icon className="size-6 text-primary" aria-hidden />
-      <h3 className="font-semibold text-foreground">{title}</h3>
+      <h2 className="font-semibold text-foreground">{title}</h2>
       <p className="flex-1 text-sm text-muted-foreground">{description}</p>
       <Link
         href="/quote"

@@ -15,7 +15,7 @@ export default function ContactPage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-        <p className="font-mono text-sm tracking-wide text-primary">
+        <p className="font-mono text-sm tracking-wide text-primary-text">
           {"// get in touch"}
         </p>
         <h1 className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl">

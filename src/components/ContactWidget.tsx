@@ -15,18 +15,42 @@ import { cn } from "@/lib/utils";
 export function ContactWidget() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
+
+    panelRef.current?.querySelector("a")?.focus();
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-3 sm:right-6 sm:bottom-6">
+    <div className="fixed right-4 bottom-4 z-50 flex flex-col-reverse items-end gap-3 sm:right-6 sm:bottom-6">
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-expanded={open}
+        aria-label={open ? "Close contact options" : "Open contact options"}
+        onClick={() => setOpen((value) => !value)}
+        className={cn(
+          "flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+        )}
+      >
+        {open ? (
+          <X className="size-5" aria-hidden />
+        ) : (
+          <MessageCircle className="size-5" aria-hidden />
+        )}
+      </button>
+
       {open && (
         <div
           ref={panelRef}
@@ -49,22 +73,6 @@ export function ContactWidget() {
           ))}
         </div>
       )}
-
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-label={open ? "Close contact options" : "Open contact options"}
-        onClick={() => setOpen((value) => !value)}
-        className={cn(
-          "flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        )}
-      >
-        {open ? (
-          <X className="size-5" aria-hidden />
-        ) : (
-          <MessageCircle className="size-5" aria-hidden />
-        )}
-      </button>
     </div>
   );
 }

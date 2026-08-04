@@ -12,6 +12,7 @@ import {
   Car,
 } from "lucide-react";
 
+import { Reveal } from "@/components/motion/Reveal";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -86,7 +87,7 @@ export default function ServicesPage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-        <p className="font-mono text-sm tracking-wide text-primary">
+        <p className="font-mono text-sm tracking-wide text-primary-text">
           {"// what we do"}
         </p>
         <h1 className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -98,7 +99,7 @@ export default function ServicesPage() {
           job below is handled the same systematic way.
         </p>
 
-        <div className="mt-12">
+        <Reveal className="mt-12">
           <h2 className="text-xl font-semibold text-foreground">
             Residential
           </h2>
@@ -107,9 +108,9 @@ export default function ServicesPage() {
               <ServiceCard key={service.title} {...service} />
             ))}
           </div>
-        </div>
+        </Reveal>
 
-        <div className="mt-14">
+        <Reveal className="mt-14">
           <h2 className="text-xl font-semibold text-foreground">
             Commercial
           </h2>
@@ -118,9 +119,9 @@ export default function ServicesPage() {
               <ServiceCard key={service.title} {...service} />
             ))}
           </div>
-        </div>
+        </Reveal>
 
-        <div className="mt-16 flex flex-col items-start gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+        <Reveal className="mt-16 flex flex-col items-start gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-foreground">
             Adelaide-owned and operated — every suburb, every job, direct
             accountability.
@@ -128,7 +129,7 @@ export default function ServicesPage() {
           <Link href="/quote" className={cn(buttonVariants(), "shrink-0")}>
             Get Your Quote
           </Link>
-        </div>
+        </Reveal>
       </section>
     </main>
   );

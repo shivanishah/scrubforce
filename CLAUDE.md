@@ -8,114 +8,141 @@ ScrubForce is a marketing website for a professional, "geeky" cleaning services 
 
 - **Positioning:** Adelaide-based, independently operated — explicitly **not a franchise**. Covers all of metropolitan Adelaide, South Australia.
 - **Brand voice:** Professional + technical/geeky. Clean grid layouts, monospace accent labels, numbered/systematic section headers (`01 —`, `02 —`), subtle micro-interactions. Reads like a sharp, detail-oriented operation, not a "cute cleaning company."
-- The full build plan and step-by-step order live in `BUILD_PLAN.md` — follow it exactly, one step per commit.
+- `BUILD_PLAN.md` has the original step-by-step build order (Steps 0–10, all complete) — keep it around as build history/reference, but this file is the source of truth for current architecture.
+
+## Commands
+
+```bash
+npm run dev      # start dev server (Turbopack) at localhost:3000
+npm run build    # production build — run before every commit
+npm run start    # serve the production build (needed for realistic Lighthouse numbers)
+npm run lint     # ESLint (flat config, eslint.config.mjs)
+npx tsc --noEmit # typecheck only
+```
+
+No test runner is configured yet.
 
 ## Tech Stack
 
-- **Next.js 16 (App Router) + TypeScript** — `src/app` directory, route per top-level nav tab
-- **Tailwind CSS v4** — CSS-first config (no `tailwind.config.js`); theme tokens live in `src/app/globals.css` under `@theme inline` and `:root`
-- **shadcn/ui** (`style: base-nova`, `baseColor: neutral`) — components generated into `src/components/ui`, installed via `npx shadcn@latest add <component>`
-- **Framer Motion** — for scroll-reveal micro-interactions (added in the Polish step); must respect `prefers-reduced-motion`
-- **React Hook Form + Zod** — for the quote and contact forms (added in Step 6)
-- **Fonts:** Manrope (body/headings, `--font-manrope`) + Space Mono (accent/labels/mono numerals, `--font-space-mono`), loaded via `next/font/google` in `src/app/layout.tsx`
+- **Next.js 16 (App Router) + TypeScript** — `src/app` directory, one route per top-level nav tab
+- **Tailwind CSS v4** — CSS-first config (no `tailwind.config.js`); all theme tokens live in `src/app/globals.css` under `@theme inline` and `:root`. New design tokens go there as CSS variables, never in a JS config file.
+- **shadcn/ui** (`style: base-nova`, `baseColor: neutral`) — components generated into `src/components/ui`, installed via `npx shadcn@latest add <component>`. This project uses shadcn's **Base UI** flavor (`@base-ui/react`), not Radix:
+  - Components take a `render={<Element />}` prop for polymorphism, not `asChild`.
+  - To style a `Link`/anchor as a button, apply `buttonVariants({...})` to its `className` directly — but always wrap it in `cn(buttonVariants({...}))`, never pass the raw string. `buttonVariants` (cva) does plain string concatenation, not tailwind-merge, so the base class's `border-transparent` and the `outline` variant's `border-border` both land in the class list; without `cn()`'s twMerge pass, CSS cascade order (not class order) silently decides the winner and can drop a visible border.
+  - Base UI's `Select` (used via RHF `Controller`) must be given a defined initial value (`""`, not `undefined`) in `defaultValues` — otherwise it logs an uncontrolled→controlled warning on first selection. An empty string still shows the placeholder correctly (Base UI checks the stringified value, not just `!= null`).
+- **Framer Motion** — scroll-reveal only for content genuinely below the fold (see "Scroll-reveal" below); must respect `prefers-reduced-motion`.
+- **React Hook Form + Zod** — quote form and contact form, with matching Zod schemas shared between client and server (`src/lib/quote-schema.ts`, `src/lib/contact-schema.ts`).
+- **Resend** — transactional email for both forms (see "Forms & email" below).
+- **Fonts:** Manrope (body/headings, `--font-manrope`) + Space Mono (accent/labels/mono numerals, `--font-space-mono`), loaded via `next/font/google` in `src/app/layout.tsx`.
 
 ## Design Tokens
 
-Defined as CSS custom properties in `src/app/globals.css` (`:root`), consumed via Tailwind's `@theme inline` mapping (e.g. `bg-background`, `text-foreground`, `bg-primary`):
+Defined as CSS custom properties in `src/app/globals.css` (`:root`), consumed via Tailwind's `@theme inline` mapping (`bg-background`, `text-foreground`, `bg-primary`, etc.):
 
 | Token | Value | Use |
 |---|---|---|
 | `--background` | `#eee6d2` | Warm cream page background |
 | `--foreground` | `#1f1b16` | Charcoal body/heading text |
 | `--card` / `--popover` | `#f6f0e0` | Slightly lighter cream for raised surfaces |
-| `--primary` | `#d97706` | Amber "signal" accent — CTA buttons, focus ring, links |
-| `--primary-foreground` | `#1f1b16` | Charcoal text on amber (5.3:1 contrast, passes AA) — do not swap for white, contrast drops to ~3.2:1 |
+| `--primary` | `#d97706` | Amber "signal" accent — CTA button backgrounds, badges |
+| `--primary-foreground` | `#1f1b16` | Charcoal text on amber buttons (5.4:1, passes AA) — don't swap for white (~3.2:1, fails) |
+| `--primary-text` | `#a3480a` | **Darker amber for standalone text on the cream background** (taglines, "01 —" numbers, stat values, "Learn more" links) — `#d97706` only hits 2.6:1 as text-on-cream (fails AA); this hits 4.8:1. Icons paired with a visible `text-foreground` label still use plain `text-primary`/`bg-primary` — the adjacent compliant text label covers the info, so the lower-contrast icon accent is an accepted tradeoff, not a bug. |
 | `--secondary` | `#ded2b3` | Muted tan for secondary buttons |
-| `--muted` / `--muted-foreground` | `#e2d8c0` / `#6b6255` | De-emphasized text/surfaces |
+| `--muted` / `--muted-foreground` | `#e2d8c0` / `#6b6255` | De-emphasized text/surfaces (4.8:1 on background) |
 | `--accent` | `#e6dcc3` | Subtle hover/active backgrounds |
+| `--destructive` | `#b91c1c` | Form error text/borders — darkened from shadcn's default `#dc2626` (3.9:1, fails AA) to hit 5.2:1 |
 | `--border` / `--input` | `#d8cbac` | Dividers, input borders |
-| `--radius` | `0.375rem` | Sharper corners than shadcn default (0.625rem) for a more systematic/grid feel |
+| `--ring` | `#a3480a` | Focus ring color — same darker amber as `--primary-text`. All `focus-visible:ring-ring/50` classes were changed to full-opacity `focus-visible:ring-ring`; at 50% opacity even the darkest reasonable amber blends to ~2:1 against the cream background (fails the 3:1 non-text contrast minimum for focus indicators) |
+| `--radius` | `0.375rem` | Sharper corners than shadcn's default `0.625rem`, for a more systematic/grid feel |
 
 Dark mode (`.dark` block) is generated by shadcn defaults but **unused** — this brand is cream-only, no dark mode toggle is planned.
 
-There is no separate `tailwind.config.ts`; new design tokens must be added as CSS variables in `globals.css`, not a JS config file (Tailwind v4 convention).
+## Folder Structure
 
-## Folder Structure Conventions
-
-- `src/app/` — one route segment per top-level nav tab (`/services`, `/residential`, `/commercial`, `/quote`, `/why-us`, `/contact`), plus `layout.tsx` (fonts, `<html>`/`<body>` shell, renders `<Header />`) and `page.tsx` (home)
-- `src/components/ui/` — shadcn-generated primitives (Button, Sheet, etc.) — treat as generated code, prefer `npx shadcn add` over hand-editing. This project uses shadcn's **Base UI** flavor (`@base-ui/react`), not Radix — components take a `render={<Element />}` prop for polymorphism, not `asChild`. To style a `Link`/anchor as a button, apply `buttonVariants({...})` to its `className` directly rather than wrapping it in `<Button asChild>` — but always wrap it in `cn(buttonVariants({...}))`, never pass the raw string. `buttonVariants` (cva) does plain concatenation, not tailwind-merge, so the base class's `border-transparent` and the `outline` variant's `border-border` both land in the class list; without `cn()`'s twMerge pass, CSS cascade order (not class order) decides the winner and silently drops the visible border.
-- `src/components/` — hand-written composed components (header, sections, forms) as they're added
-- `src/components/Header.tsx` — sticky site header (Step 1). Desktop: inline nav + amber CTA link styled via `buttonVariants()`. Mobile (`<md`): CTA + hamburger that opens a shadcn `Sheet` (right-side drawer) with the same nav links; links auto-close the sheet via `SheetClose`. Active route highlighted using `usePathname()`.
-- `src/components/home/Hero.tsx` — home page hero (Step 2): mono tagline, headline/subheadline (Adelaide-based/no-franchise/all-metro messaging), primary "Get Your Quote" + secondary "View Services" CTAs, CSS grid-line background (radial-mask faded, built from `--border`), and a 3-stat trust row. **Stat numbers (500+ / 98% / 20+) are placeholders** — ask the user for real figures before launch.
-- `src/components/services/ServiceCard.tsx` — reusable icon/title/description/"Learn more" card used on the Services overview page (Step 3), linking out to an anchor on the Residential/Commercial detail pages (e.g. `/residential#regular-house-cleaning`). Icons come from `lucide-react` (already the project's configured icon library per `components.json`). Step 4/5 must add matching `id` attributes to each service section so these anchor links resolve.
-- `src/app/services/page.tsx` — Services overview (Step 3): intro + two card grids (Residential's 5 services, Commercial's 4 sectors) built from `ServiceCard`, plus a closing "Adelaide-owned, no franchise" reinforcement banner with a quote CTA.
-- `src/components/services/DetailServiceCard.tsx` — larger service card used on the Residential/Commercial detail pages: icon, `id` (anchor target, `scroll-mt-20` to clear the sticky header), title, description, "Get a Quote" CTA to `/quote`. Shared by Step 4 and Step 5.
-- `src/components/services/TrustBadges.tsx` — reusable `{icon, label}[]` badge grid (2 cols mobile / 4 cols desktop); each page supplies its own badge content (Residential's guarantee-flavored set now, Commercial's Step 5 set will differ).
-- `src/app/residential/page.tsx` — Residential page (Step 4): 5 `DetailServiceCard`s (ids matching the Services page anchors: `regular-house-cleaning`, `deep-spring-clean`, `end-of-lease-cleaning`, `window-glass-cleaning`, `bathroom-cleaning`), a "What's Included" checklist, a guarantee statement + `TrustBadges`, and a closing quote CTA banner.
-- `src/components/services/ProcessSteps.tsx` — reusable `{number, title, description}[]` numbered process list, styled with the geeky monospace `01 —` numbering. Used by Commercial's "How It Works" (Step 5); Why Us's 3-step process (Step 7) should reuse it too rather than duplicating the pattern.
-- `src/app/commercial/page.tsx` — Commercial page (Step 5): 4 `DetailServiceCard`s (ids matching the Services page anchors: `builders-offices`, `banks-financial`, `gyms-fitness`, `auto-dealerships`), a 4-step `ProcessSteps` "How It Works", a `TrustBadges` "Trust Signals" block (insured / trained staff / consistent scheduling / dedicated contact, not a call centre), and a closing quote CTA banner.
-- `src/components/services/PlaceholderImage.tsx` — dashed-border, grid-patterned placeholder used everywhere a real photo will eventually go (no image-generation tool is available in this environment, and no real photos have been supplied yet — decided with the user to use these instead of hotlinked stock photos). Takes a `label` describing what the real photo should show. `DetailServiceCard` accepts an optional `imageLabel` prop that renders one of these above the icon; only Commercial's cards pass it today. **When real photos are ready, replace `PlaceholderImage` usages with actual `<Image>` components** — check `src/app/commercial/page.tsx` for every current placeholder (1 hero banner + 4 card images).
-- `src/components/quote/AIQuoteFlow.tsx` — isolated Phase 2 "coming soon" quote flow scaffold (see Step 6 status below); must stay decoupled from the working Phase 1 form
-- `src/components/ContactWidget.tsx` — floating multi-channel chat bubble (Step 8), self-contained so channel links can be swapped for a real chat provider later
-- `src/lib/utils.ts` — shadcn's `cn()` helper
-
-## Build/Test/Commit Workflow
-
-Follow `BUILD_PLAN.md`'s step order exactly — one step, one commit, in sequence. For every step:
-
-1. Implement only that step's scope
-2. `npm run build` and `npm run lint` must both pass with no errors
-3. Visually verify the section (dev server + browser/screenshot check) at mobile/tablet/desktop breakpoints
-4. Fix issues before moving on
-5. Update this file and `README.md` to reflect the current state
-6. Commit with the exact message specified in `BUILD_PLAN.md` for that step
-7. Ask before making any design decision not already specified in `BUILD_PLAN.md` (e.g. icon set, stock imagery, backend choice) rather than guessing silently
-
-## Commands
-
-```bash
-npm run dev      # start dev server (Turbopack) at localhost:3000
-npm run build    # production build — must pass before every commit
-npm run lint     # ESLint (flat config, eslint.config.mjs)
-npm run start    # serve the production build
-npx tsc --noEmit # typecheck only
+```
+src/
+  app/
+    layout.tsx          Fonts, <html>/<body> shell, renders Header/Footer/ContactWidget globally
+    page.tsx             Home (renders Hero)
+    services/page.tsx    Services overview
+    residential/page.tsx Residential detail page
+    commercial/page.tsx  Commercial detail page
+    why-us/page.tsx
+    contact/page.tsx
+    quote/page.tsx
+    api/quote/route.ts   Quote form submit handler
+    api/contact/route.ts Contact form submit handler
+  components/
+    Header.tsx, Footer.tsx, ContactWidget.tsx   Global chrome
+    ui/                  shadcn-generated primitives — prefer `npx shadcn add` over hand-editing
+    home/Hero.tsx
+    services/            ServiceCard, DetailServiceCard, TrustBadges, ProcessSteps, PlaceholderImage
+    quote/                QuoteForm, AIQuoteFlow
+    contact/ContactForm.tsx
+    motion/Reveal.tsx     Shared scroll-reveal wrapper
+  lib/
+    utils.ts              shadcn's cn() helper
+    nav-links.ts           NAV_LINKS/QUOTE_LINK — shared by Header and Footer
+    contact-channels.ts    CONTACT_CHANNELS/CONTACT_INFO — shared by Contact page, Footer, ContactWidget
+    quote-schema.ts, contact-schema.ts   Zod schemas shared by client forms and API routes
 ```
 
-No test runner is configured yet.
+### Shared components worth knowing about
 
-## Content Reference (keep in sync with BUILD_PLAN.md)
+- **`ServiceCard`** (`services/ServiceCard.tsx`) — small icon/title/description/"Learn more" card, used on the Services overview page. Links to an anchor on the matching Residential/Commercial detail page (e.g. `/residential#regular-house-cleaning`).
+- **`DetailServiceCard`** (`services/DetailServiceCard.tsx`) — larger card used on Residential/Commercial: icon, `id` (anchor target, `scroll-mt-20` to clear the sticky header), `<h2>` title (no `<h2>` precedes these cards on either page, so they're the first heading level after `<h1>` — do not change back to `<h3>`, that skips a level and fails the Lighthouse heading-order audit), description, "Get a Quote" CTA. Optional `imageLabel` prop renders a `PlaceholderImage` above the icon (only Commercial's cards use this).
+- **`TrustBadges`** (`services/TrustBadges.tsx`) — reusable `{icon, label}[]` badge grid (2 cols mobile / 4 cols desktop); each page supplies its own badge content.
+- **`ProcessSteps`** (`services/ProcessSteps.tsx`) — reusable `{number, title, description}[]` numbered list, styled with the geeky monospace `01 —` numbering. Used by Commercial's "How It Works" and Why Us's "How It Works".
+- **`PlaceholderImage`** (`services/PlaceholderImage.tsx`) — dashed-border, grid-patterned placeholder used everywhere a real photo will eventually go. No image-generation tool is available in this environment and no real photos have been supplied — decided with the user to use these instead of hotlinked stock photos. Takes a `label` describing what the real photo should show. **When real photos are ready, replace every usage with an actual `<Image>`** — check `src/app/commercial/page.tsx` (1 hero banner + 4 card images) and `src/app/contact/page.tsx` (1 map placeholder).
+- **`Reveal`** (`motion/Reveal.tsx`) — fade/slide-up scroll reveal (`whileInView`, `once: true`), no-ops via `useReducedMotion()` when the user prefers reduced motion. **Only wrap content that's genuinely below the fold.** Wrapping above-the-fold content (a page's hero/intro block right after `<h1>`) measurably hurts Lighthouse LCP, because the element paints at `opacity: 0` first and only becomes visible after React hydrates and Framer Motion runs — that later repaint is what gets measured as "largest contentful paint". This is why `Hero.tsx` and the top blocks of `/quote` and `/contact` are **not** wrapped in `Reveal` (removed after measuring a 4.0s → 2.7s LCP improvement on Home and 3.6s → ~1.0s-equivalent-class improvement on Contact), while lower sections on `/services`, `/residential`, `/commercial`, and `/why-us` are.
 
-**Residential services (Step 4, 5 total):** Regular House Cleaning, Deep/Spring Clean, End of Lease Cleaning, Window & Glass Cleaning, Bathroom Cleaning
+## Forms & Email
 
-**Commercial sectors (Step 5, 4 total):** Commercial Builders/Offices, Banks/Financial Institutions, Gyms/Fitness Centres, Auto/Car Dealerships
+Both forms follow the same pattern: RHF + Zod on the client, the same Zod schema re-validated server-side in a Next.js Route Handler, then a Resend email send.
 
-**Contact:** Business hours Monday–Sunday, 8:00 AM–8:00 PM. Channels: phone, email, WhatsApp, Facebook Messenger, Instagram, TikTok.
+- **Quote form** (`/quote`, `QuoteForm.tsx` → `POST /api/quote`) — name, email, phone, suburb/postcode, property type, service (options depend on property type — Residential's 5 vs Commercial's 4), frequency, optional message.
+- **Contact form** (`/contact`, `ContactForm.tsx` → `POST /api/contact`) — name, email, message.
+- Both routes require `RESEND_API_KEY` and `QUOTE_TO_EMAIL` env vars (see `.env.example`); `QUOTE_FROM_EMAIL` is optional (defaults to Resend's shared testing address `onboarding@resend.dev`). Without the required vars, the route returns a 500 with a clear message and logs the submission server-side instead of losing it.
+- **Real secrets go in `.env.local` (gitignored, never committed).** `.env.example` must stay blank placeholders — it *is* committed as the template for other developers. This came up because real Resend API key/email values were pasted into `.env.example` twice during the build; both times they were moved to `.env.local` and the example file reset to blanks.
 
-## Quote System Status
+## AI Quote Flow (Phase 2 — scaffolded, not wired)
 
-- **Phase 1 (standard form): live.** `/quote` renders `QuoteForm` (`src/components/quote/QuoteForm.tsx`) — React Hook Form + Zod (`src/lib/quote-schema.ts`, shared with the server route), fields: name, email, phone, suburb/postcode, property type, service (options depend on property type), frequency, optional message. Submits to `POST /api/quote` (`src/app/api/quote/route.ts`), which re-validates server-side and emails the submission via **Resend**. Requires `RESEND_API_KEY` and `QUOTE_TO_EMAIL` env vars (see `.env.example`) — without them the route returns a 500 with a clear message and logs the submission instead of losing it.
-- **Phase 2 (AI quote flow): scaffolded, not wired.** `src/components/quote/AIQuoteFlow.tsx` renders an inert step-indicator + property-type-picker preview, dimmed behind a "coming soon" badge overlay (`pointer-events-none`, `tabIndex={-1}` on all controls). Rendered next to `QuoteForm` on `/quote`. No pricing logic, no step transitions — purely a visual shell per the build plan.
-- Base UI's `Select` (via `Controller`) must be given a defined initial value (`""`, not `undefined`) in RHF `defaultValues` — otherwise it logs an uncontrolled→controlled warning on first selection. Empty string still shows the placeholder correctly (Base UI checks the stringified value, not just `!= null`).
+`src/components/quote/AIQuoteFlow.tsx`, rendered next to `QuoteForm` on `/quote`. Renders an inert step-indicator + property-type-picker preview (`pointer-events-none`, `tabIndex={-1}` on all controls), dimmed behind a "coming soon" badge overlay. No pricing logic, no step transitions — purely a visual shell per the original build plan, kept isolated so it can be built out later without touching the working Phase 1 form.
 
-## Why Us Page (Step 7)
+## Placeholder Content (needs real data before launch)
 
-`src/app/why-us/page.tsx` — re-clean guarantee callout, `TrustBadges` (Fully Insured / Trained & Inducted Staff / Background-Checked / Eco-Friendly Products — a different set from Residential's), `ProcessSteps` 3-step "How It Works" (Get Your Quote → We Clean → Enjoy Your Space), a "no franchise" positioning callout, and a closing quote CTA. Both `TrustBadges` and `ProcessSteps` from Steps 4–5 were reused here as intended rather than rebuilt.
+- **Hero trust stats** (`Hero.tsx`): 500+ homes/offices cleaned, 98% satisfaction, 20+ suburbs — placeholder numbers.
+- **Contact details** (`lib/contact-channels.ts`): phone `(08) XXXX XXXX`, email `hello@scrubforce.com.au`, and all four social channel `href`s (WhatsApp/Messenger/Instagram/TikTok) are `"#"`. This one file is the single source of truth for the Contact page, Footer, and `ContactWidget` — update it once to go live everywhere.
+- **Photos**: every `PlaceholderImage` usage (see above).
+- **Map embed** (`/contact`): currently a `PlaceholderImage` — needs a real business address before a Google Maps embed is worth adding.
 
-## Contact Page & ContactWidget (Step 8)
+## Content Reference
 
-- `src/lib/contact-channels.ts` — single source of truth for `CONTACT_CHANNELS` (WhatsApp/Messenger/Instagram/TikTok, lucide-react has no brand logos so generic icons stand in: `MessageCircle`/`MessagesSquare`/`Camera`/`Music2`) and `CONTACT_INFO` (phone/email/hours). **All four channel `href`s are `"#"` placeholders and phone/email are placeholder text** (`(08) XXXX XXXX`, `hello@scrubforce.com.au`) — real business details weren't available yet; update this one file to go live everywhere at once.
-- `src/components/ContactWidget.tsx` — floating bottom-right chat bubble, rendered globally from `src/app/layout.tsx` (visible on every page, not just `/contact`). Self-contained: toggling, Escape-to-close, and channel list all read from `contact-channels.ts`, so swapping in a real chat provider (Tawk.to, Crisp, Intercom) later means replacing this one component without touching call sites.
-- `src/app/contact/page.tsx` — phone/email/hours cards, the same channel list as icon links, a `PlaceholderImage` standing in for a map embed (no real business address yet to embed), and a contact form.
-- `src/components/contact/ContactForm.tsx` + `src/lib/contact-schema.ts` + `src/app/api/contact/route.ts` — same RHF+Zod+Resend pattern as the quote form (Step 6), reusing `RESEND_API_KEY`/`QUOTE_TO_EMAIL`/`QUOTE_FROM_EMAIL` env vars rather than introducing new ones for a second inbox.
+**Residential services (5):** Regular House Cleaning, Deep/Spring Clean, End of Lease Cleaning, Window & Glass Cleaning, Bathroom Cleaning
 
-## Footer (Step 9)
+**Commercial sectors (4):** Commercial Builders/Offices, Banks/Financial Institutions, Gyms/Fitness Centres, Auto/Car Dealerships
 
-`src/lib/nav-links.ts` — `NAV_LINKS`/`QUOTE_LINK` extracted here so `Header.tsx` and `Footer.tsx` share one source of truth instead of duplicating the tab list. `src/components/Footer.tsx` — repeats nav links, `CONTACT_CHANNELS` social links (same placeholders as Contact page), an Adelaide-service-area note, and a copyright line with a dynamic year. Rendered globally from `layout.tsx` below `{children}`, above `ContactWidget`.
+**Business hours:** Monday–Sunday, 8:00 AM–8:00 PM
 
-## Decisions Made So Far
+## Accessibility & Performance Notes
 
-- Font pairing: **Manrope + Space Mono** (chosen over Inter/JetBrains Mono alternatives offered in the build plan)
-- CTA accent color: **amber `#d97706`** (chosen over teal or deep red alternatives), paired with charcoal (not white) foreground text for AA contrast
-- Corner radius tightened from shadcn's default `0.625rem` to `0.375rem` for a sharper, more systematic feel
-- Quote form backend: **Resend** (chosen over a database) for emailing submissions — simpler for quote-request volume, no DB to manage
-- Real secrets go in `.env.local` (gitignored, never committed) — `.env.example` must stay blank placeholders since it *is* committed as the template for other developers
+Lighthouse (production build, all 7 pages): Accessibility 100, Best Practices 100, SEO 100, Performance 92–97. Fixed during the polish pass:
+
+- Amber-on-cream text contrast (`--primary-text` token — see Design Tokens)
+- Destructive/error color contrast (`--destructive` darkened)
+- Focus ring contrast (`--ring` darkened + opacity modifier removed — see Design Tokens)
+- Heading order on Residential/Commercial (`DetailServiceCard` title is `<h2>`, not `<h3>` — no `<h2>` precedes it on either page)
+- `ContactWidget` keyboard access: the panel is rendered *after* the trigger button in DOM order (with `flex-col-reverse` to keep the panel visually above the button) so Tab moves from button → panel items in the right order; opening the panel moves focus to the first link, and Escape closes it and returns focus to the button.
+- LCP: don't wrap above-the-fold content in `Reveal` (see the `Reveal` note above).
+
+## Git Workflow
+
+Every commit in this repo's history follows: implement → `npm run build && npm run lint` clean → visually verify at mobile/tablet/desktop → update this file + `README.md` → commit → ask before pushing to `origin/main` (pushed on request, not automatically). Keep following that pattern for future work in this repo.
+
+## Decisions Made
+
+- Font pairing: **Manrope + Space Mono** (chosen over Inter/JetBrains Mono alternatives)
+- CTA accent color: **amber `#d97706`**, button text charcoal not white (for AA contrast); a separate darker amber `--primary-text`/`--ring` (`#a3480a`) is used for standalone text and focus rings
+- Corner radius tightened to `0.375rem` for a sharper, more systematic feel
+- Quote/contact form backend: **Resend** (chosen over a database) — simpler for this volume, no DB to manage
+- Images: **styled placeholder blocks**, not hotlinked stock photos — no image-gen tool available in this environment and no real photos supplied yet

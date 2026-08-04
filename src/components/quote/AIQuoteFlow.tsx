@@ -23,7 +23,7 @@ export function AIQuoteFlow() {
         <ol className="flex items-center gap-3 overflow-x-auto">
           {STEPS.map((step) => (
             <li key={step.number} className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="font-mono text-xs font-bold text-primary">
+              <span className="font-mono text-xs font-bold text-primary-text">
                 {step.number}
               </span>
               <span className="text-xs text-muted-foreground">{step.label}</span>
